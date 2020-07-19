@@ -29,16 +29,16 @@ func (p *accelerate) update(curs []*current) {
 	for _, v := range curs {
 		exist, ok := p.stocks[v.symbol]
 		if ok {
-			exist.times++
-			if v.percent > exist.percent {
-			}
+			v.flag = p.times
+			exist.current = *v
 		} else {
+			v.flag = p.times
 			p.stocks[v.symbol] = &speed{current: *v}
 		}
 	}
 
 	for k, v := range p.stocks {
-		if v.times != p.times {
+		if v.flag != p.times {
 			delete(p.stocks, k)
 		}
 	}

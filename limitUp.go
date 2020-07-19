@@ -25,22 +25,19 @@ func (p *limitUp) update(curs []*current) {
 	for _, v := range curs {
 		exist, ok := p.stocks[v.symbol]
 		if ok {
-			exist.times++
-			if exist.current > 9.90 {
-				if v.current < exist.current {
-					delete(p.stocks, v.symbol)
+			if exist.percent > 9.90 {
+				if v.percent < exist.percent {
 					fmt.Printf("%s %s 打开缺口\n", v.name, v.symbol)
 				}
 			}
-		} else {
-			v.times = p.times
-			p.stocks[v.symbol] = v
 		}
+		v.flag = p.times
+		p.stocks[v.symbol] = v
 	}
 
 	for k, v := range p.stocks {
-		if v.times != p.times {
-			if v.current > 9.90 {
+		if v.flag != p.times {
+			if v.percent > 9.90 {
 				fmt.Printf("%s %s 打开缺口\n", v.name, v.symbol)
 			}
 			delete(p.stocks, k)

@@ -12,7 +12,7 @@ type current struct {
 	current            float64
 	currentYearPercent float64
 	name               string
-	times              int
+	flag               int
 }
 
 func getTopPercent(count int) ([]*current, error) {
