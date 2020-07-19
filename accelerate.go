@@ -1,9 +1,45 @@
 package main
 
-type accelerate struct {
-	stocks map[string]stock
+type speed struct {
+	current
+	index    int
+	count    int
+	percents [60]float64
 }
 
-func (p *accelerate) update(curs []current) {
+type accelerate struct {
+	stocks map[string]*speed
+	times  int
+}
 
+func newAccelerate() *accelerate {
+	return &accelerate{stocks: make(map[string]*speed, 1000), times: 0}
+}
+
+func (p *accelerate) reset() {
+	for k := range p.stocks {
+		delete(p.stocks, k)
+	}
+	p.times = 0
+}
+
+func (p *accelerate) update(curs []*current) {
+
+	p.times++
+	for _, v := range curs {
+		exist, ok := p.stocks[v.symbol]
+		if ok {
+			exist.times++
+			if v.percent > exist.percent {
+			}
+		} else {
+			p.stocks[v.symbol] = &speed{current: *v}
+		}
+	}
+
+	for k, v := range p.stocks {
+		if v.times != p.times {
+			delete(p.stocks, k)
+		}
+	}
 }

@@ -12,9 +12,10 @@ type current struct {
 	current            float64
 	currentYearPercent float64
 	name               string
+	times              int
 }
 
-func getTopPercent(count int) ([]current, error) {
+func getTopPercent(count int) ([]*current, error) {
 	remoteURL := "https://xueqiu.com/service/v5/stock/screener/quote/list"
 	values := url.Values{}
 	values.Add("page", "1")
@@ -37,9 +38,10 @@ func getTopPercent(count int) ([]current, error) {
 
 	data := m["data"].(map[string]interface{})
 	list := data["list"].([]interface{})
-	curs := make([]current, len(list))
+	curs := make([]*current, len(list))
 	for i, v := range list {
 		item := v.(map[string]interface{})
+		curs[i] = &current{}
 		curs[i].symbol, _ = item["symbol"].(string)
 		curs[i].percent, _ = item["percent"].(float64)
 		curs[i].current, _ = item["current"].(float64)

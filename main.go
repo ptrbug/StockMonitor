@@ -19,8 +19,9 @@ func main() {
 	}
 
 	lp := newLimitUp()
-	acc := accelerate{}
+	acc := newAccelerate()
 
+	needReset := true
 	topPercentCount := 500
 	for {
 		tmNow := time.Now()
@@ -32,11 +33,18 @@ func main() {
 		if weekday >= 1 && weekday <= 5 {
 			if (hour >= 9 && hour <= 10) || (hour == 11 && minute < 30) || (hour >= 13 && hour < 15) {
 				request = true
+			} else {
+				needReset = true
 			}
 		}
 
 		request = true
 		if request {
+			if needReset {
+				lp.reset()
+				acc.reset()
+				needReset = false
+			}
 			curs, err := getTopPercent(topPercentCount)
 			if err != nil {
 				fmt.Printf("getTopPercnet(%d) failed\n", topPercentCount)
@@ -44,6 +52,8 @@ func main() {
 			lp.update(curs)
 			acc.update(curs)
 		}
+
+		<-time.After(time.Second * 5)
 	}
 
 }
