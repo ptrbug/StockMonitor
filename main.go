@@ -17,7 +17,6 @@ func getStockHistory(symbol string, cookies []*http.Cookie) (*stockHistory, erro
 	values.Add("period", "day")
 	values.Add("type", "before")
 	values.Add("count", "-7")
-	values.Add("indicator", "line,pe,pb,ps,pcf,market_capital,agt,ggt,balance")
 	body, err := fetch(remoteURL, values, cookies)
 	if err != nil {
 		return nil, err
@@ -30,11 +29,37 @@ func getStockHistory(symbol string, cookies []*http.Cookie) (*stockHistory, erro
 	}
 
 	data := m["data"].(map[string]interface{})
-	column := data["column"].([]interface{})
-	fmt.Println(column)
+	item := data["item"].([]interface{})
 
 	history := &stockHistory{}
+	first := len(item) - 1
+	last := first - 4
+	if last < 0 {
+		last = 0
+	}
+	for i := first; i >= last; i-- {
+		array := item[i].([]interface{})
+		history.close[first-i] = array[5].(float64)
+	}
 	return history, nil
+}
+
+func getAllHistory(cookies []*http.Cookie) (map[string]*stockHistory, error) {
+	todays, err := getStockToday(1000)
+	if err != nil {
+		return nil, fmt.Errorf("error")
+	}
+
+	allHistory := make(map[string]*stockHistory, len(todays))
+	for _, v := range todays {
+		history, err := getStockHistory(v.symbol, cookies)
+		if err != nil {
+			fmt.Printf("getStockHistory : %s error\n", v.symbol)
+		} else {
+			allHistory[v.symbol] = history
+		}
+	}
+	return allHistory, nil
 }
 
 func getStockToday(topPercentCount int) ([]stockToday, error) {
@@ -85,8 +110,8 @@ func main() {
 		fmt.Println(v.Value)
 	}
 
-	history, _ := getStockHistory("SH601798", cookies)
-	fmt.Println(history)
+	allHistory, _ := getAllHistory(cookies)
+	fmt.Println(allHistory)
 
 	/*
 		t := time.NewTimer(time.Second * 5)
