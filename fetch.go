@@ -2,19 +2,18 @@ package main
 
 import (
 	"compress/gzip"
-	"io"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 )
 
-func fetch(remoteURL string, queryValues url.Values) (body []byte, err error) {
+func fetch(remoteURL string, queryValues url.Values) ([]byte, error) {
 
 	client := &http.Client{}
-	body = nil
 	uri, err := url.Parse(remoteURL)
 	if err != nil {
-		return
+		return nil, err
 	}
 	if queryValues != nil {
 		values := uri.Query()
@@ -27,7 +26,7 @@ func fetch(remoteURL string, queryValues url.Values) (body []byte, err error) {
 	}
 	reqest, err := http.NewRequest("GET", uri.String(), nil)
 	if err != nil {
-		return
+		return nil, err
 	}
 	reqest.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	reqest.Header.Add("Accept-Encoding", "gzip, deflate")
@@ -39,31 +38,32 @@ func fetch(remoteURL string, queryValues url.Values) (body []byte, err error) {
 
 	response, err := client.Do(reqest)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode == 200 {
+		var body []byte
 		switch response.Header.Get("Content-Encoding") {
 		case "gzip":
-			reader, _ := gzip.NewReader(response.Body)
-			for {
-				buf := make([]byte, 1024)
-				n, err := reader.Read(buf)
-
-				if err != nil && err != io.EOF {
-					panic(err)
-				}
-
-				if n == 0 {
-					break
-				}
-				body = append(body, buf...)
+			gr, err := gzip.NewReader(response.Body)
+			if err != nil {
+				return nil, err
 			}
+			body, err = ioutil.ReadAll(gr)
+			if err != nil {
+				return nil, err
+			}
+
 		default:
-			body, _ = ioutil.ReadAll(response.Body)
+			body, err = ioutil.ReadAll(response.Body)
+			if err != nil {
+				return nil, err
+			}
 
 		}
+		return body, nil
 	}
-	return
+
+	return nil, fmt.Errorf("response.StatusCode code:%v", response.StatusCode)
 }
