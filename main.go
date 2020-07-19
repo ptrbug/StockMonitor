@@ -38,7 +38,6 @@ func main() {
 			}
 		}
 
-		request = true
 		if request {
 			if needReset {
 				lp.reset()
@@ -50,7 +49,9 @@ func main() {
 				fmt.Printf("getTopPercnet(%d) failed\n", topPercentCount)
 			}
 			lp.update(curs)
-			acc.update(curs)
+			if hour > 9 || (hour == 9 && minute > 25) {
+				acc.update(curs)
+			}
 		}
 
 		<-time.After(time.Second * 5)
