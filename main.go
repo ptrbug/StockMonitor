@@ -18,7 +18,7 @@ func main() {
 		fmt.Println(v.Value)
 	}
 
-	lp := limitUp{}
+	lp := newLimitUp()
 	acc := accelerate{}
 
 	topPercentCount := 500
