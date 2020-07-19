@@ -1,14 +1,14 @@
 package main
 
 type stockHistory struct {
-	close [5]float32
+	close [5]float64
 }
 
 type stockToday struct {
 	symbol             string
-	percent            float32
-	current            float32
-	currentYearPercent float32
+	percent            float64
+	current            float64
+	currentYearPercent float64
 	name               string
 }
 

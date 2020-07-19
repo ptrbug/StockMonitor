@@ -8,7 +8,7 @@ import (
 	"net/url"
 )
 
-func fetch(remoteURL string, queryValues url.Values) ([]byte, error) {
+func fetch(remoteURL string, queryValues url.Values, cookies []*http.Cookie) ([]byte, error) {
 
 	client := &http.Client{}
 	uri, err := url.Parse(remoteURL)
@@ -35,6 +35,12 @@ func fetch(remoteURL string, queryValues url.Values) ([]byte, error) {
 	reqest.Header.Add("Host", uri.Host)
 	reqest.Header.Add("Referer", uri.String())
 	reqest.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0")
+
+	if cookies != nil {
+		for _, v := range cookies {
+			reqest.AddCookie(v)
+		}
+	}
 
 	response, err := client.Do(reqest)
 	if err != nil {
@@ -64,6 +70,9 @@ func fetch(remoteURL string, queryValues url.Values) ([]byte, error) {
 		}
 		return body, nil
 	}
+
+	xx, _ := ioutil.ReadAll(response.Body)
+	fmt.Println(string(xx))
 
 	return nil, fmt.Errorf("response.StatusCode code:%v", response.StatusCode)
 }
