@@ -2,25 +2,15 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"time"
 )
 
 func main() {
 
-	resp, err := http.Get("https://xueqiu.com/")
-	if err != nil {
-		return
-	}
-	cookies := resp.Cookies()
-	for _, v := range cookies {
-		fmt.Println(v.Name)
-		fmt.Println(v.Value)
-	}
-
 	lp := newLimitUp()
 	acc := newAccelerate()
 
+	fmt.Print("启动\n")
 	needReset := true
 	topPercentCount := 500
 	for {
@@ -43,6 +33,7 @@ func main() {
 				lp.reset()
 				acc.reset()
 				needReset = false
+				fmt.Print("开盘采集中\n")
 			}
 			curs, err := getTopPercent(topPercentCount)
 			if err != nil {
