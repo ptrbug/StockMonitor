@@ -38,15 +38,27 @@ func getTopPercent(count int) ([]*current, error) {
 
 	data := m["data"].(map[string]interface{})
 	list := data["list"].([]interface{})
-	curs := make([]*current, len(list))
-	for i, v := range list {
+	curs := make([]*current, 0, len(list))
+	for _, v := range list {
+
 		item := v.(map[string]interface{})
-		curs[i] = &current{}
-		curs[i].symbol, _ = item["symbol"].(string)
-		curs[i].percent, _ = item["percent"].(float64)
-		curs[i].current, _ = item["current"].(float64)
-		curs[i].currentYearPercent, _ = item["current_year_percent"].(float64)
-		curs[i].name, _ = item["name"].(string)
+
+		symbol, _ := item["symbol"].(string)
+		if len(symbol) >= 5 && (symbol[2:5] == "688" || symbol[2:5] == "787" || symbol[2:5] == "789") {
+			continue
+		}
+		name, _ := item["name"].(string)
+		if name[0:1] == "N" {
+			continue
+		}
+
+		cur := &current{}
+		cur.symbol = symbol
+		cur.percent, _ = item["percent"].(float64)
+		cur.current, _ = item["current"].(float64)
+		cur.currentYearPercent, _ = item["current_year_percent"].(float64)
+		cur.name = name
+		curs = append(curs, cur)
 	}
 	return curs, nil
 }

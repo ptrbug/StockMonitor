@@ -20,14 +20,16 @@ func main() {
 		minute := tmNow.Local().Minute()
 
 		request := false
+		hm := hour*60 + minute
 		if weekday >= 1 && weekday <= 5 {
-			if (hour >= 9 && hour <= 10) || (hour == 11 && minute < 30) || (hour >= 13 && hour < 15) {
+			if (hm > (9*60+25) && hm < (11*60+30)) || (hm > (13*60-1) && hm < (15*60)) {
 				request = true
 			} else {
 				needReset = true
 			}
 		}
 
+		request = true
 		if request {
 			if needReset {
 				lp.reset()
@@ -40,9 +42,7 @@ func main() {
 				fmt.Printf("getTopPercnet(%d) failed\n", topPercentCount)
 			}
 			lp.update(curs)
-			if hour > 9 || (hour == 9 && minute > 25) {
-				acc.update(curs)
-			}
+			acc.update(curs)
 		}
 
 		<-time.After(time.Second * 5)
