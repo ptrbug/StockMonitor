@@ -10,8 +10,8 @@ func main() {
 	lp := newLimitUp()
 	acc := newAccelerate()
 
-	fmt.Print("启动\n")
-	needReset := true
+	fmt.Print("start...\n")
+	isWorking := false
 	topPercentCount := 500
 	for {
 		tmNow := time.Now()
@@ -24,18 +24,15 @@ func main() {
 		if weekday >= 1 && weekday <= 5 {
 			if (hm > (9*60+25) && hm < (11*60+30)) || (hm > (13*60-1) && hm < (15*60)) {
 				request = true
-			} else {
-				needReset = true
 			}
 		}
 
-		request = true
 		if request {
-			if needReset {
+			if !isWorking {
 				lp.reset()
 				acc.reset()
-				needReset = false
-				fmt.Print("开盘采集中\n")
+				isWorking = true
+				fmt.Print("working...\n")
 			}
 			curs, err := getTopPercent(topPercentCount)
 			if err != nil {
@@ -43,6 +40,11 @@ func main() {
 			}
 			lp.update(curs)
 			acc.update(curs)
+		} else {
+			if isWorking {
+				fmt.Print("Waiting...\n")
+			}
+			isWorking = false
 		}
 
 		<-time.After(time.Second * 5)
