@@ -5,7 +5,13 @@ import (
 	"time"
 )
 
+func updateDaily() {
+	loadAllDaily()
+}
+
 func main() {
+
+	go updateDaily()
 
 	lp := newLimitUp()
 	acc := newAccelerate()
