@@ -50,18 +50,18 @@ func (p *speed) isSpeedUp(percent float64) bool {
 	return false
 }
 
-type excurrent struct {
+type currentspeed struct {
 	*current
 	speed
 }
 
 type accelerate struct {
-	curs  map[string]*excurrent
+	curs  map[string]*currentspeed
 	times int
 }
 
 func newAccelerate() *accelerate {
-	return &accelerate{curs: make(map[string]*excurrent, 1000), times: 0}
+	return &accelerate{curs: make(map[string]*currentspeed, 1000), times: 0}
 }
 
 func (p *accelerate) reset() {
@@ -86,7 +86,7 @@ func (p *accelerate) update(curs []*current) {
 
 		} else {
 			v.flag = p.times
-			cur := &excurrent{current: v}
+			cur := &currentspeed{current: v}
 			cur.push(v.percent)
 			p.curs[v.symbol] = cur
 		}

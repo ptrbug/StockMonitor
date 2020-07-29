@@ -2,18 +2,24 @@ package main
 
 import "fmt"
 
+type stock struct {
+	*current
+	*daily
+	maxPercent float64
+}
+
 type limitUp struct {
-	curs  map[string]*current
-	times int
+	stocks map[string]*stock
+	times  int
 }
 
 func newLimitUp() *limitUp {
-	return &limitUp{curs: make(map[string]*current, 1000), times: 0}
+	return &limitUp{stocks: make(map[string]*stock, 1000), times: 0}
 }
 
 func (p *limitUp) reset() {
-	for k := range p.curs {
-		delete(p.curs, k)
+	for k := range p.stocks {
+		delete(p.stocks, k)
 	}
 	p.times = 0
 }
@@ -23,24 +29,31 @@ func (p *limitUp) update(curs []*current) {
 	p.times++
 
 	for _, v := range curs {
-		exist, ok := p.curs[v.symbol]
+		exist, ok := p.stocks[v.symbol]
 		if ok {
-			if exist.percent > 9.90 {
+			if exist.percent == exist.maxPercent {
 				if v.percent < exist.percent {
 					fmt.Printf("%s %s 打开缺口 涨幅:%v 现价:%v \n", v.name, v.symbol, v.percent, v.current)
 				}
 			}
+			v.flag = p.times
+			p.stocks[v.symbol].current = v
+		} else {
+			var day *daily
+			var maxPercent float64
+			s := &stock{current: v, daily: day, maxPercent: maxPercent}
+			v.flag = p.times
+			p.stocks[v.symbol] = s
 		}
-		v.flag = p.times
-		p.curs[v.symbol] = v
+
 	}
 
-	for k, v := range p.curs {
+	for k, v := range p.stocks {
 		if v.flag != p.times {
 			if v.percent > 9.90 {
 				fmt.Printf("%s %s 打开缺口\n", v.name, v.symbol)
 			}
-			delete(p.curs, k)
+			delete(p.stocks, k)
 		}
 	}
 

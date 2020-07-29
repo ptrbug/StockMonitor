@@ -2,14 +2,18 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
 )
 
+//MaxHistorySize max history size
+const MaxHistorySize = 5
+
 type daily struct {
-	Close [5]float64
+	Close [MaxHistorySize]float64
 }
 
 func getDaily(symbol string, cookies []*http.Cookie) (*daily, error) {
@@ -19,7 +23,7 @@ func getDaily(symbol string, cookies []*http.Cookie) (*daily, error) {
 	values.Add("begin", strconv.FormatInt(time.Now().UnixNano()/1000000, 10))
 	values.Add("period", "day")
 	values.Add("type", "before")
-	values.Add("count", "-7")
+	values.Add("count", fmt.Sprintf("-%d", MaxHistorySize))
 	body, err := fetch(remoteURL, values, cookies)
 	if err != nil {
 		return nil, err

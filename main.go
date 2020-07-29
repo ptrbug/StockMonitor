@@ -11,7 +11,7 @@ func main() {
 	acc := newAccelerate()
 
 	fmt.Print("start...\n")
-	isWorking := false
+	isWaitForOpen := true
 	topPercentCount := 500
 	for {
 		tmNow := time.Now()
@@ -19,19 +19,19 @@ func main() {
 		hour := tmNow.Local().Hour()
 		minute := tmNow.Local().Minute()
 
-		request := false
+		opening := false
 		hm := hour*60 + minute
 		if weekday >= 1 && weekday <= 5 {
 			if (hm > (9*60+25) && hm < (11*60+30)) || (hm > (13*60-1) && hm < (15*60)) {
-				request = true
+				opening = true
 			}
 		}
 
-		if request {
-			if !isWorking {
+		if opening {
+			if isWaitForOpen {
 				lp.reset()
 				acc.reset()
-				isWorking = true
+				isWaitForOpen = false
 				fmt.Print("working...\n")
 			}
 			curs, err := getTopPercent(topPercentCount)
@@ -41,10 +41,10 @@ func main() {
 			lp.update(curs)
 			acc.update(curs)
 		} else {
-			if isWorking {
+			if !isWaitForOpen {
 				fmt.Print("Waiting...\n")
 			}
-			isWorking = false
+			isWaitForOpen = true
 		}
 
 		<-time.After(time.Second * 5)
