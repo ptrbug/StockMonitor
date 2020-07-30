@@ -5,13 +5,17 @@ import (
 	"time"
 )
 
-func updateDaily() {
-	loadAllDaily()
+func checkHistory() {
+	history := newHisory()
+	for {
+		history.update()
+		time.Sleep(time.Second * 5)
+	}
 }
 
 func main() {
 
-	go updateDaily()
+	go checkHistory()
 
 	lp := newLimitUp()
 	acc := newAccelerate()
