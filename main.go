@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-func checkHistory() {
-	history := newHisory()
+func checkHistory(history *history) {
+
 	for {
 		history.update()
 		time.Sleep(time.Second * 5)
@@ -15,7 +15,8 @@ func checkHistory() {
 
 func main() {
 
-	go checkHistory()
+	history := newHisory()
+	go checkHistory(history)
 
 	lp := newLimitUp()
 	acc := newAccelerate()
@@ -48,7 +49,7 @@ func main() {
 			if err != nil {
 				fmt.Printf("getTopPercnet(%d) failed\n", topPercentCount)
 			}
-			lp.update(curs)
+			lp.update(history, curs)
 			acc.update(curs)
 		} else {
 			if !isWaitForOpen {

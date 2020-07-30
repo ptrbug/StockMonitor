@@ -13,7 +13,15 @@ import (
 const MaxHistorySize = 5
 
 type daily struct {
-	Close [MaxHistorySize]float64
+	maxPrice   float64
+	maxPercent float64
+	Close      [MaxHistorySize]float64
+}
+
+func calcMaxmaxPriceAndPercent(lastClosePrice float64) (float64, float64) {
+	maxPrice, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", lastClosePrice+0.005), 64)
+	maxPercent = maxPrice / lastClosePrice
+	fmt.Print(maxPrice)
 }
 
 func getDaily(symbol string, cookies []*http.Cookie) (*daily, error) {

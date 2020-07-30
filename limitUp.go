@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type stock struct {
 	*current
 	*daily
@@ -24,7 +22,8 @@ func (p *limitUp) reset() {
 	p.times = 0
 }
 
-func (p *limitUp) update(curs []*current) {
+
+func (p *limitUp) update(history *history, curs []*current) {
 
 	p.times++
 
@@ -33,25 +32,33 @@ func (p *limitUp) update(curs []*current) {
 		if ok {
 			if exist.percent == exist.maxPercent {
 				if v.percent < exist.percent {
-					fmt.Printf("%s %s 打开缺口 涨幅:%v 现价:%v \n", v.name, v.symbol, v.percent, v.current)
+
 				}
 			}
 			v.flag = p.times
 			p.stocks[v.symbol].current = v
 		} else {
-			var day *daily
-			var maxPercent float64
-			s := &stock{current: v, daily: day, maxPercent: maxPercent}
-			v.flag = p.times
-			p.stocks[v.symbol] = s
-		}
 
+			var daily *daily
+			history.mutex.Lock()
+			daily, _ = history.data[v.symbol]
+			history.mutex.Unlock()
+
+			if daily != nil {
+				if daily.Close[0] > 0 {
+					var maxPercent float64
+					s := &stock{current: v, daily: daily, maxPercent: maxPercent}
+					v.flag = p.times
+					p.stocks[v.symbol] = s
+				}
+			}
+		}
 	}
 
 	for k, v := range p.stocks {
 		if v.flag != p.times {
-			if v.percent > 9.90 {
-				fmt.Printf("%s %s 打开缺口\n", v.name, v.symbol)
+			if v.percent == v.maxPercent {
+
 			}
 			delete(p.stocks, k)
 		}
