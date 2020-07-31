@@ -19,9 +19,9 @@ type daily struct {
 }
 
 func calcMaxmaxPriceAndPercent(lastClosePrice float64) (float64, float64) {
-	maxPrice, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", lastClosePrice+0.005), 64)
-	maxPercent = maxPrice / lastClosePrice
-	fmt.Print(maxPrice)
+	maxPrice, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", lastClosePrice*1.1+0.005), 64)
+	maxPercent, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", maxPrice*100/lastClosePrice+0.005), 64)
+	return maxPrice, maxPercent
 }
 
 func getDaily(symbol string, cookies []*http.Cookie) (*daily, error) {
@@ -56,5 +56,9 @@ func getDaily(symbol string, cookies []*http.Cookie) (*daily, error) {
 		array := item[i].([]interface{})
 		day.Close[first-i] = array[5].(float64)
 	}
+	if day.Close[0] <= 0 {
+		return nil, fmt.Errorf("data error")
+	}
+	day.maxPrice, day.maxPercent = calcMaxmaxPriceAndPercent(day.Close[0])
 	return day, nil
 }

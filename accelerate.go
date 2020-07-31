@@ -51,34 +51,34 @@ func (p *speed) isSpeedUp(percent float64) bool {
 }
 
 type currentspeed struct {
-	*current
+	*realtime
 	speed
 }
 
 type accelerate struct {
-	curs  map[string]*currentspeed
+	reals map[string]*currentspeed
 	times int
 }
 
 func newAccelerate() *accelerate {
-	return &accelerate{curs: make(map[string]*currentspeed, 1000), times: 0}
+	return &accelerate{reals: make(map[string]*currentspeed, 1000), times: 0}
 }
 
 func (p *accelerate) reset() {
-	for k := range p.curs {
-		delete(p.curs, k)
+	for k := range p.reals {
+		delete(p.reals, k)
 	}
 	p.times = 0
 }
 
-func (p *accelerate) update(curs []*current) {
+func (p *accelerate) update(reals []*realtime) {
 
 	p.times++
-	for _, v := range curs {
-		exist, ok := p.curs[v.symbol]
+	for _, v := range reals {
+		exist, ok := p.reals[v.symbol]
 		if ok {
 			v.flag = p.times
-			exist.current = v
+			exist.realtime = v
 			if exist.isSpeedUp(v.percent) {
 				fmt.Printf("%s %s 加速上涨 涨幅:%v 现价:%v \n", v.name, v.symbol, v.percent, v.current)
 			}
@@ -86,15 +86,15 @@ func (p *accelerate) update(curs []*current) {
 
 		} else {
 			v.flag = p.times
-			cur := &currentspeed{current: v}
+			cur := &currentspeed{realtime: v}
 			cur.push(v.percent)
-			p.curs[v.symbol] = cur
+			p.reals[v.symbol] = cur
 		}
 	}
 
-	for k, v := range p.curs {
+	for k, v := range p.reals {
 		if v.flag != p.times {
-			delete(p.curs, k)
+			delete(p.reals, k)
 		}
 	}
 }

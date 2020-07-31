@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-type current struct {
+type realtime struct {
 	symbol             string
 	percent            float64
 	current            float64
@@ -15,7 +15,7 @@ type current struct {
 	flag               int
 }
 
-func getTopPercent(count int) ([]*current, error) {
+func getTopPercent(count int) ([]*realtime, error) {
 	remoteURL := "https://xueqiu.com/service/v5/stock/screener/quote/list"
 	values := url.Values{}
 	values.Add("page", "1")
@@ -38,7 +38,7 @@ func getTopPercent(count int) ([]*current, error) {
 
 	data := m["data"].(map[string]interface{})
 	list := data["list"].([]interface{})
-	curs := make([]*current, 0, len(list))
+	curs := make([]*realtime, 0, len(list))
 	for _, v := range list {
 
 		item := v.(map[string]interface{})
@@ -52,7 +52,7 @@ func getTopPercent(count int) ([]*current, error) {
 			continue
 		}
 
-		cur := &current{}
+		cur := &realtime{}
 		cur.symbol = symbol
 		cur.percent, _ = item["percent"].(float64)
 		cur.current, _ = item["current"].(float64)

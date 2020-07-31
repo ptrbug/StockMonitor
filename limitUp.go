@@ -1,9 +1,13 @@
 package main
 
+import (
+	"fmt"
+	"time"
+)
+
 type stock struct {
-	*current
+	*realtime
 	*daily
-	maxPercent float64
 }
 
 type limitUp struct {
@@ -22,21 +26,22 @@ func (p *limitUp) reset() {
 	p.times = 0
 }
 
-
-func (p *limitUp) update(history *history, curs []*current) {
+func (p *limitUp) update(tmNow time.Time, history *history, reals []*realtime) {
 
 	p.times++
 
-	for _, v := range curs {
+	strTime := fmt.Sprintf("%d:%d:%d", tmNow.Hour(), tmNow.Minute(), tmNow.Second())
+
+	for _, v := range reals {
 		exist, ok := p.stocks[v.symbol]
 		if ok {
-			if exist.percent == exist.maxPercent {
-				if v.percent < exist.percent {
-
+			if exist.current == exist.maxPrice {
+				if v.current < exist.maxPrice {
+					fmt.Printf("%s %s %s 打开缺口 涨幅:%v 现价:%v \n", strTime, v.name, v.symbol, v.percent, v.current)
 				}
 			}
 			v.flag = p.times
-			p.stocks[v.symbol].current = v
+			p.stocks[v.symbol].realtime = v
 		} else {
 
 			var daily *daily
@@ -46,8 +51,7 @@ func (p *limitUp) update(history *history, curs []*current) {
 
 			if daily != nil {
 				if daily.Close[0] > 0 {
-					var maxPercent float64
-					s := &stock{current: v, daily: daily, maxPercent: maxPercent}
+					s := &stock{realtime: v, daily: daily}
 					v.flag = p.times
 					p.stocks[v.symbol] = s
 				}
@@ -57,8 +61,8 @@ func (p *limitUp) update(history *history, curs []*current) {
 
 	for k, v := range p.stocks {
 		if v.flag != p.times {
-			if v.percent == v.maxPercent {
-
+			if v.current == v.maxPrice {
+				fmt.Printf("%s %s %s 打开缺口\n", strTime, v.name, v.symbol)
 			}
 			delete(p.stocks, k)
 		}

@@ -25,10 +25,10 @@ func main() {
 	isWaitForOpen := true
 	topPercentCount := 500
 	for {
-		tmNow := time.Now()
-		weekday := tmNow.Local().Weekday()
-		hour := tmNow.Local().Hour()
-		minute := tmNow.Local().Minute()
+		tmNow := time.Now().Local()
+		weekday := tmNow.Weekday()
+		hour := tmNow.Hour()
+		minute := tmNow.Minute()
 
 		opening := false
 		hm := hour*60 + minute
@@ -45,12 +45,12 @@ func main() {
 				isWaitForOpen = false
 				fmt.Print("working...\n")
 			}
-			curs, err := getTopPercent(topPercentCount)
+			realtime, err := getTopPercent(topPercentCount)
 			if err != nil {
 				fmt.Printf("getTopPercnet(%d) failed\n", topPercentCount)
 			}
-			lp.update(history, curs)
-			acc.update(curs)
+			lp.update(tmNow, history, realtime)
+			acc.update(realtime)
 		} else {
 			if !isWaitForOpen {
 				fmt.Print("Waiting...\n")
