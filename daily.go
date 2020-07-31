@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"net/url"
 	"strconv"
-	"time"
 )
 
 //MaxHistorySize max history size
@@ -19,16 +19,17 @@ type daily struct {
 }
 
 func calcMaxmaxPriceAndPercent(lastClosePrice float64) (float64, float64) {
-	maxPrice, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", lastClosePrice*1.1+0.005), 64)
-	maxPercent, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", maxPrice*100/lastClosePrice+0.005), 64)
+	n10 := math.Pow10(2)
+	maxPrice := math.Trunc((lastClosePrice*1.1+0.5/n10)*n10) / n10
+	maxPercent := math.Trunc((maxPrice*100/lastClosePrice+0.5/n10)*n10) / n10
 	return maxPrice, maxPercent
 }
 
-func getDaily(symbol string, cookies []*http.Cookie) (*daily, error) {
+func getDaily(query int64, symbol string, cookies []*http.Cookie) (*daily, error) {
 	remoteURL := "https://stock.xueqiu.com/v5/stock/chart/kline.json"
 	values := url.Values{}
 	values.Add("symbol", symbol)
-	values.Add("begin", strconv.FormatInt(time.Now().UnixNano()/1000000, 10))
+	values.Add("begin", strconv.FormatInt(query*1000, 10))
 	values.Add("period", "day")
 	values.Add("type", "before")
 	values.Add("count", fmt.Sprintf("-%d", MaxHistorySize))

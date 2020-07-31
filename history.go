@@ -38,11 +38,11 @@ func (p *history) getAllStockSymbol() (map[string]struct{}, error) {
 	return symbols, nil
 }
 
-func (p *history) download(symbols []string, cookies []*http.Cookie) (map[string]*daily, error) {
+func (p *history) download(query int64, symbols []string, cookies []*http.Cookie) (map[string]*daily, error) {
 
 	data := make(map[string]*daily, len(symbols))
 	for _, v := range symbols {
-		day, err := getDaily(v, cookies)
+		day, err := getDaily(query, v, cookies)
 		if err != nil {
 			fmt.Printf("getStockHistory : %s error\n", v)
 		} else {
@@ -128,10 +128,9 @@ func (p *history) update() {
 	tmNow := time.Now().Local()
 	query := time.Date(tmNow.Year(), tmNow.Month(), tmNow.Day(), 0, 0, 0, 0, time.Local).Unix()
 	if tmNow.Hour() < 15 || (tmNow.Hour() == 15 && tmNow.Minute() < 1) {
-		query -= 24 * 3600 * 60
+		query -= 24 * 60 * 60
 	}
 
-	p.mutex.Unlock()
 	if query != p.query || p.due == 0 || p.count <= 0 || len(p.data) < p.count {
 
 		resp, err := http.Get("https://xueqiu.com/")
@@ -186,7 +185,7 @@ func (p *history) update() {
 		}
 		p.mutex.Unlock()
 
-		data, err = p.download(downList, cookies)
+		data, err = p.download(query, downList, cookies)
 		if err != nil {
 			return
 		}

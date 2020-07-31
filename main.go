@@ -25,7 +25,7 @@ func main() {
 	isWaitForOpen := true
 	topPercentCount := 500
 	for {
-		tmNow := time.Now().Local()
+		tmNow := time.Now()
 		weekday := tmNow.Weekday()
 		hour := tmNow.Hour()
 		minute := tmNow.Minute()

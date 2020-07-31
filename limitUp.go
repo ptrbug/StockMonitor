@@ -50,11 +50,9 @@ func (p *limitUp) update(tmNow time.Time, history *history, reals []*realtime) {
 			history.mutex.Unlock()
 
 			if daily != nil {
-				if daily.Close[0] > 0 {
-					s := &stock{realtime: v, daily: daily}
-					v.flag = p.times
-					p.stocks[v.symbol] = s
-				}
+				s := &stock{realtime: v, daily: daily}
+				v.flag = p.times
+				p.stocks[v.symbol] = s
 			}
 		}
 	}
