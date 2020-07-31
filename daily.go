@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -16,13 +15,6 @@ type daily struct {
 	maxPrice   float64
 	maxPercent float64
 	Close      [MaxHistorySize]float64
-}
-
-func calcMaxmaxPriceAndPercent(lastClosePrice float64) (float64, float64) {
-	n10 := math.Pow10(2)
-	maxPrice := math.Trunc((lastClosePrice*1.1+0.5/n10)*n10) / n10
-	maxPercent := math.Trunc((maxPrice*100/lastClosePrice+0.5/n10)*n10) / n10
-	return maxPrice, maxPercent
 }
 
 func getDaily(query int64, symbol string, cookies []*http.Cookie) (*daily, error) {

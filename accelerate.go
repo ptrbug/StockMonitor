@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 const maxPrecentRecord = 12
 
@@ -71,7 +74,7 @@ func (p *accelerate) reset() {
 	p.times = 0
 }
 
-func (p *accelerate) update(reals []*realtime) {
+func (p *accelerate) update(tmNow time.Time, reals []*realtime) {
 
 	p.times++
 	for _, v := range reals {
@@ -80,7 +83,7 @@ func (p *accelerate) update(reals []*realtime) {
 			v.flag = p.times
 			exist.realtime = v
 			if exist.isSpeedUp(v.percent) {
-				fmt.Printf("%s %s 加速上涨 涨幅:%v 现价:%v \n", v.name, v.symbol, v.percent, v.current)
+				fmt.Printf("%s %s %s 加速上涨 涨幅:%v 现价:%v \n", timeToString(tmNow), v.name, v.symbol, v.percent, v.current)
 			}
 			exist.push(v.percent)
 

@@ -15,6 +15,8 @@ func checkHistory(history *history) {
 
 func main() {
 
+	setAutoStart(true)
+
 	history := newHisory()
 	go checkHistory(history)
 
@@ -50,7 +52,7 @@ func main() {
 				fmt.Printf("getTopPercnet(%d) failed\n", topPercentCount)
 			}
 			lp.update(tmNow, history, realtime)
-			acc.update(realtime)
+			acc.update(tmNow, realtime)
 		} else {
 			if !isWaitForOpen {
 				fmt.Print("Waiting...\n")
