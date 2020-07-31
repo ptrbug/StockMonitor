@@ -27,7 +27,7 @@ func newHisory() *history {
 }
 
 func (p *history) getAllStockSymbol() (map[string]struct{}, error) {
-	curs, err := getTopPercent(10)
+	curs, err := getTopPercent(10000)
 	if err != nil {
 		return nil, err
 	}
@@ -40,6 +40,8 @@ func (p *history) getAllStockSymbol() (map[string]struct{}, error) {
 
 func (p *history) download(query int64, symbols []string, cookies []*http.Cookie) (map[string]*daily, error) {
 
+	fmt.Println("download start")
+	percent := 0
 	data := make(map[string]*daily, len(symbols))
 	for _, v := range symbols {
 		day, err := getDaily(query, v, cookies)
@@ -48,8 +50,14 @@ func (p *history) download(query int64, symbols []string, cookies []*http.Cookie
 		} else {
 			data[v] = day
 		}
+		curPercent := len(data) * 100 / len(symbols)
+		if curPercent > percent {
+			percent = curPercent
+			fmt.Printf("download complete:%d%%\n", curPercent)
+		}
 		time.Sleep(time.Millisecond * 200)
 	}
+	fmt.Println("download finished")
 	return data, nil
 }
 
