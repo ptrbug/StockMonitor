@@ -42,16 +42,11 @@ func getTopPercent(count int) ([]*realtime, error) {
 	for _, v := range list {
 
 		item := v.(map[string]interface{})
-
 		symbol, _ := item["symbol"].(string)
-		if len(symbol) >= 5 && (symbol[2:5] == "688" || symbol[2:5] == "787" || symbol[2:5] == "789") {
-			continue
-		}
 		name, _ := item["name"].(string)
-		if name[0:1] == "N" {
+		if !isSymbolMatch(symbol, name) {
 			continue
 		}
-
 		cur := &realtime{}
 		cur.symbol = symbol
 		cur.percent, _ = item["percent"].(float64)
