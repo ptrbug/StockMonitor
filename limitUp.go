@@ -33,10 +33,10 @@ func (p *limitUp) update(tmNow time.Time, history *history, reals []*realtime) {
 	for _, v := range reals {
 		exist, ok := p.stocks[v.symbol]
 		if ok {
-			if exist.current == exist.maxPrice {
-				if v.current < exist.maxPrice {
-					continueCount := calcContinueLimitUpCount(exist.Close[:])
-					fmt.Printf("%s %s %s 打开缺口 涨幅:%v 现价:%v 连续涨停:%d\n", timeToString(tmNow), v.name, v.symbol, v.percent, v.current, continueCount)
+			if exist.current == exist.limitUpPrice {
+				if v.current < exist.limitUpPrice {
+
+					fmt.Printf("%s %s %s 打开缺口 涨幅:%v 现价:%v 连续涨停:%d\n", timeToString(tmNow), v.name, v.symbol, v.percent, v.current, exist.limitUpContinueCount)
 				}
 			}
 			v.flag = p.times
@@ -58,9 +58,8 @@ func (p *limitUp) update(tmNow time.Time, history *history, reals []*realtime) {
 
 	for k, v := range p.stocks {
 		if v.flag != p.times {
-			if v.current == v.maxPrice {
-				continueCount := calcContinueLimitUpCount(v.Close[:])
-				fmt.Printf("%s %s %s 打开缺口 连续涨停:%d\n", timeToString(tmNow), v.name, v.symbol, continueCount)
+			if v.current == v.limitUpPrice {
+				fmt.Printf("%s %s %s 打开缺口 连续涨停:%d\n", timeToString(tmNow), v.name, v.symbol, v.limitUpContinueCount)
 			}
 			delete(p.stocks, k)
 		}

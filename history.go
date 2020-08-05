@@ -93,7 +93,7 @@ func (p *history) load(filepath string) (map[string]*daily, error) {
 		return nil, err
 	}
 	for _, v := range data {
-		v.maxPrice, v.maxPercent = calcMaxmaxPriceAndPercent(v.Close[0])
+		v.limitUpPrice, v.limitUpPercent = calcLimitUpPriceAndlimitUpPercent(v.Close[0])
 	}
 	return data, nil
 }

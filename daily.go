@@ -12,9 +12,10 @@ import (
 const MaxHistorySize = 20
 
 type daily struct {
-	maxPrice   float64
-	maxPercent float64
-	Close      [MaxHistorySize]float64
+	limitUpPrice         float64
+	limitUpPercent       float64
+	limitUpContinueCount int
+	Close                [MaxHistorySize]float64
 }
 
 func getDaily(query int64, symbol string, cookies []*http.Cookie) (*daily, error) {
@@ -47,6 +48,7 @@ func getDaily(query int64, symbol string, cookies []*http.Cookie) (*daily, error
 	if day.Close[0] <= 0 {
 		return nil, fmt.Errorf("data error")
 	}
-	day.maxPrice, day.maxPercent = calcMaxmaxPriceAndPercent(day.Close[0])
+	day.limitUpPrice, day.limitUpPercent = calcLimitUpPriceAndlimitUpPercent(day.Close[0])
+	day.limitUpContinueCount = calcLimitUpContinueCount(day.Close[:])
 	return day, nil
 }
