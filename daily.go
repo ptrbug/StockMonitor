@@ -9,7 +9,7 @@ import (
 )
 
 //MaxHistorySize max history size
-const MaxHistorySize = 5
+const MaxHistorySize = 20
 
 type daily struct {
 	maxPrice   float64
@@ -40,14 +40,9 @@ func getDaily(query int64, symbol string, cookies []*http.Cookie) (*daily, error
 	item := data["item"].([]interface{})
 
 	day := &daily{}
-	first := len(item) - 1
-	last := first - 4
-	if last < 0 {
-		last = 0
-	}
-	for i := first; i >= last; i-- {
+	for i := len(item) - 1; i >= 0; i-- {
 		array := item[i].([]interface{})
-		day.Close[first-i] = array[5].(float64)
+		day.Close[len(item)-1-i] = array[5].(float64)
 	}
 	if day.Close[0] <= 0 {
 		return nil, fmt.Errorf("data error")
