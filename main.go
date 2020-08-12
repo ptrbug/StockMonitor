@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -14,6 +16,15 @@ func checkHistory(history *history) {
 }
 
 func main() {
+
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		panic(err)
+	}
+	err = os.Chdir(dir)
+	if err != nil {
+		panic(err)
+	}
 
 	setAutoStart(true)
 
