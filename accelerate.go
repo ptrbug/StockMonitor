@@ -2,12 +2,19 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"time"
 )
 
-const maxPrecentRecord = 12
+const maxPrecentRecord = 60
 
-var risen [12]float64 = [12]float64{2.0, 2.2, 2.4, 2.6, 2.8, 3.0, 3.2, 3.4, 3.6, 3.8, 3.9, 4.0}
+var risen [maxPrecentRecord]float64
+
+func init() {
+	for i := 0; i < maxPrecentRecord; i++ {
+		risen[i] = 1 + math.Sqrt(float64(i+1))/math.Sqrt(float64(maxPrecentRecord))*3
+	}
+}
 
 type speed struct {
 	index    int
@@ -41,13 +48,11 @@ func (p *speed) prev(offset int) float64 {
 
 func (p *speed) isSpeedUp(percent float64) bool {
 	sz := p.size()
-	for i := 0; i < maxPrecentRecord; i++ {
-		if sz > i {
-			lastPercent := p.prev(-i)
-			diff := percent - lastPercent
-			if diff > risen[i] {
-				return true
-			}
+	for i := 0; i < sz; i++ {
+		lastPercent := p.prev(-i)
+		diff := percent - lastPercent
+		if diff >= risen[i] {
+			return true
 		}
 	}
 	return false
