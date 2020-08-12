@@ -23,8 +23,9 @@ func main() {
 	lp := newLimitUp()
 	acc := newAccelerate()
 
-	fmt.Print("start...\n")
-	isWaitForOpen := true
+	fmt.Print("启动...\n")
+	isLastOpening := false
+	isFristUpdate := true
 	topPercentCount := 500
 	for {
 		tmStart := time.Now()
@@ -41,11 +42,10 @@ func main() {
 		}
 
 		if opening {
-			if isWaitForOpen {
+			if !isLastOpening {
 				lp.reset()
 				acc.reset()
-				isWaitForOpen = false
-				fmt.Print("working...\n")
+				fmt.Print("开盘中...\n")
 			}
 			realtime, err := getTopPercent(topPercentCount)
 			if err != nil {
@@ -54,17 +54,19 @@ func main() {
 			lp.update(tmStart, history, realtime)
 			acc.update(tmStart, realtime)
 		} else {
-			if !isWaitForOpen {
-				fmt.Print("Waiting...\n")
+			if isLastOpening || isFristUpdate {
+				fmt.Print("休盘中...\n")
 			}
-			isWaitForOpen = true
 		}
+		isLastOpening = opening
+		isFristUpdate = false
 
 		tmEnd := time.Now()
 		duration := tmEnd.Sub(tmStart)
 		if duration < time.Second {
 			<-time.After(time.Second - duration)
 		}
+
 	}
 
 }

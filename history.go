@@ -40,7 +40,7 @@ func (p *history) getAllStockSymbol() (map[string]struct{}, error) {
 
 func (p *history) download(query int64, symbols []string, cookies []*http.Cookie) (map[string]*daily, error) {
 
-	fmt.Println("download start")
+	fmt.Println("开始下载历史日线数据...")
 	percent := 0
 	data := make(map[string]*daily, len(symbols))
 	for _, v := range symbols {
@@ -53,11 +53,11 @@ func (p *history) download(query int64, symbols []string, cookies []*http.Cookie
 		curPercent := len(data) * 100 / len(symbols)
 		if curPercent > percent {
 			percent = curPercent
-			fmt.Printf("download complete:%d%%\n", curPercent)
+			fmt.Printf("进度:%d%%\n", curPercent)
 		}
 		time.Sleep(time.Millisecond * 200)
 	}
-	fmt.Println("download finished")
+	fmt.Println("历史日线数据下载完成")
 	return data, nil
 }
 
