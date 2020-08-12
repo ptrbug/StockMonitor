@@ -46,16 +46,16 @@ func (p *speed) prev(offset int) float64 {
 	return p.percents[index]
 }
 
-func (p *speed) isSpeedUp(percent float64) bool {
+func (p *speed) isSpeedUp(percent float64) (bool, int, float64) {
 	sz := p.size()
 	for i := 0; i < sz; i++ {
 		lastPercent := p.prev(-i)
 		diff := percent - lastPercent
 		if diff >= risen[i] {
-			return true
+			return true, i + 1, diff
 		}
 	}
-	return false
+	return false, 0, 0
 }
 
 type currentspeed struct {
@@ -87,8 +87,10 @@ func (p *accelerate) update(tmNow time.Time, reals []*realtime) {
 		if ok {
 			v.flag = p.times
 			exist.realtime = v
-			if exist.isSpeedUp(v.percent) {
-				fmt.Printf("%s %s %s 加速上涨 涨幅:%v 现价:%v \n", timeToString(tmNow), v.name, v.symbol, v.percent, v.current)
+			isUp, dt, value := exist.isSpeedUp(v.percent)
+			if isUp {
+				fmt.Printf("%s %s %s 加速上涨 涨幅:%v 现价:%v (%d秒涨%.2f)\n",
+					timeToString(tmNow), v.name, v.symbol, v.percent, v.current, dt, value)
 			}
 			exist.push(v.percent)
 
