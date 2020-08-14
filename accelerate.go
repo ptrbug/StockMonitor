@@ -2,19 +2,10 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"time"
 )
 
 const maxPrecentRecord = 60
-
-var risen [maxPrecentRecord]float64
-
-func init() {
-	for i := 0; i < maxPrecentRecord; i++ {
-		risen[i] = 1 + math.Sqrt(float64(i+1))/math.Sqrt(float64(maxPrecentRecord))*3
-	}
-}
 
 type speed struct {
 	index    int
@@ -51,7 +42,7 @@ func (p *speed) isSpeedUp(percent float64) (bool, int, float64) {
 	for i := 0; i < sz; i++ {
 		lastPercent := p.prev(-i)
 		diff := percent - lastPercent
-		if diff >= risen[i] {
+		if diff >= config.JiaShu.Risen[i] {
 			return true, i + 1, diff
 		}
 	}

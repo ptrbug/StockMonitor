@@ -1,7 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"time"
@@ -17,6 +21,7 @@ func checkHistory(history *history) {
 
 func main() {
 
+	//ch dir
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		panic(err)
@@ -26,7 +31,49 @@ func main() {
 		panic(err)
 	}
 
+	//set restart
 	setAutoStart(true)
+
+	//load config
+	data, err := ioutil.ReadFile("config.json")
+	if err != nil {
+		log.Fatal("config.json reading error", err)
+		return
+	}
+
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		log.Fatal("Unmarshal config.json file error", err)
+	}
+
+	//check config
+	isValidRisen := true
+	for i := 0; i < len(config.JiaShu.Risen); i++ {
+		if config.JiaShu.Risen[i] <= 0 {
+			isValidRisen = false
+			break
+		}
+		for j := i + 1; j < len(config.JiaShu.Risen); j++ {
+			if config.JiaShu.Risen[i] > config.JiaShu.Risen[j] {
+				isValidRisen = false
+				break
+			}
+		}
+		if !isValidRisen {
+			break
+		}
+	}
+
+	if !isValidRisen {
+		fmt.Printf("config.json { \"JiaShu\" : {\"Risen\"} }配置无效,使用默认配置\n")
+		for i := 0; i < len(config.JiaShu.Risen); i++ {
+			config.JiaShu.Risen[i] = 1 + math.Sqrt(float64(i+1))/math.Sqrt(float64(maxPrecentRecord))*3
+			fmt.Printf("%0.2f ", config.JiaShu.Risen[i])
+			if i%10 == 9 {
+				fmt.Printf("\n")
+			}
+		}
+	}
 
 	history := newHisory()
 	go checkHistory(history)
@@ -56,17 +103,23 @@ func main() {
 			if !isLastOpening {
 				lp.reset()
 				acc.reset()
-				fmt.Print("开盘中...\n")
+				fmt.Print("开盘中,等待开盘...\n")
 			}
 			realtime, err := getTopPercent(topPercentCount)
 			if err != nil {
 				fmt.Printf("getTopPercnet(%d) failed\n", topPercentCount)
 			}
-			lp.update(tmStart, history, realtime)
-			acc.update(tmStart, realtime)
+			if config.QueKou.On {
+				lp.update(tmStart, history, realtime)
+			}
+
+			if config.JiaShu.On {
+				acc.update(tmStart, realtime)
+			}
+
 		} else {
 			if isLastOpening || isFristUpdate {
-				fmt.Print("休盘中...\n")
+				fmt.Print("休盘中,等待开盘...\n")
 			}
 		}
 		isLastOpening = opening
