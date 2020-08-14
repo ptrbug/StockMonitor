@@ -50,7 +50,7 @@ func (p *limitUp) update(tmNow time.Time, history *history, reals []*realtime) {
 			history.mutex.Unlock()
 
 			if daily != nil {
-				if config.QueKou.MaxLB >= 0 && daily.limitUpContinueCount <= config.QueKou.MaxLB {
+				if config.QueKou.MaxLB < 0 || daily.limitUpContinueCount <= config.QueKou.MaxLB {
 					s := &stock{realtime: v, daily: daily}
 					v.flag = p.times
 					p.stocks[v.symbol] = s
