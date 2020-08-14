@@ -103,7 +103,7 @@ func main() {
 			if !isLastOpening {
 				lp.reset()
 				acc.reset()
-				fmt.Print("开盘中,等待开盘...\n")
+				fmt.Print("开盘中...\n")
 			}
 			realtime, err := getTopPercent(topPercentCount)
 			if err != nil {
@@ -119,7 +119,7 @@ func main() {
 
 		} else {
 			if isLastOpening || isFristUpdate {
-				fmt.Print("休盘中,等待开盘...\n")
+				fmt.Print("休盘中...\n")
 			}
 		}
 		isLastOpening = opening
