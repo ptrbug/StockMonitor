@@ -29,6 +29,11 @@ func (p *speed) size() int {
 	return p.count
 }
 
+func (p *speed) clear() {
+	p.count = 0
+	p.index = 0
+}
+
 func (p *speed) prev(offset int) float64 {
 	index := p.index + offset
 	if index < 0 {
@@ -82,6 +87,7 @@ func (p *accelerate) update(tmNow time.Time, reals []*realtime) {
 			if isUp {
 				fmt.Printf("%s %s %s 加速上涨 涨幅:%v 现价:%v (%d秒涨%.2f)\n",
 					timeToString(tmNow), v.name, v.symbol, v.percent, v.current, dt, value)
+				exist.clear()
 			}
 			exist.push(v.percent)
 
