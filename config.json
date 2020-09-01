@@ -1,4 +1,4 @@
 {
-	"QueKou": { "On": true, "MaxLB": -1},
+	"QueKou": { "On": false, "MaxLB": -1},
 	"JiaShu" : {"On" : true, "Risen" : []}	
 }

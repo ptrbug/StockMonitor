@@ -67,7 +67,7 @@ func main() {
 	if !isValidRisen {
 		fmt.Printf("config.json { \"JiaShu\" : {\"Risen\"} }配置无效,使用默认配置\n")
 		for i := 0; i < len(config.JiaShu.Risen); i++ {
-			config.JiaShu.Risen[i] = 1 + math.Sqrt(float64(i+1))/math.Sqrt(float64(maxPrecentRecord))*3
+			config.JiaShu.Risen[i] = 1.5 + math.Sqrt(float64(i+1))/math.Sqrt(float64(maxPrecentRecord))*3.5
 			fmt.Printf("%0.2f ", config.JiaShu.Risen[i])
 			if i%10 == 9 {
 				fmt.Printf("\n")
