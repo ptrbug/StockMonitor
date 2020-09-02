@@ -85,8 +85,12 @@ func (p *accelerate) update(tmNow time.Time, reals []*realtime) {
 			exist.realtime = v
 			isUp, dt, value := exist.isSpeedUp(v.percent)
 			if isUp {
-				fmt.Printf("%s %s %s 加速上涨 涨幅:%v 现价:%v (%d秒涨%.2f)\n",
+				msg := fmt.Sprintf("%s %s %s 加速上涨 涨幅:%v 现价:%v (%d秒涨%.2f)\n",
 					timeToString(tmNow), v.name, v.symbol, v.percent, v.current, dt, value)
+
+				msgLog.Printf("%s", msg)
+				fmt.Printf("%s", msg)
+
 				exist.clear()
 			}
 			exist.push(v.percent)

@@ -36,8 +36,11 @@ func (p *limitUp) update(tmNow time.Time, history *history, reals []*realtime) {
 			if exist.current == exist.limitUpPrice {
 				if v.current < exist.limitUpPrice {
 
-					fmt.Printf("%s %s %s 打开缺口 涨幅:%.2f 现价:%0.2f 连续涨停:%d\n",
+					msg := fmt.Sprintf("%s %s %s 打开缺口 涨幅:%.2f 现价:%0.2f 连续涨停:%d\n",
 						timeToString(tmNow), v.name, v.symbol, v.percent, v.current, exist.limitUpContinueCount)
+
+					msgLog.Printf("%s", msg)
+					fmt.Printf("%s", msg)
 				}
 			}
 			v.flag = p.times
@@ -62,8 +65,11 @@ func (p *limitUp) update(tmNow time.Time, history *history, reals []*realtime) {
 	for k, v := range p.stocks {
 		if v.flag != p.times {
 			if v.current == v.limitUpPrice {
-				fmt.Printf("%s %s %s 打开缺口 连续涨停:%d\n",
+				msg := fmt.Sprintf("%s %s %s 打开缺口 连续涨停:%d\n",
 					timeToString(tmNow), v.name, v.symbol, v.limitUpContinueCount)
+
+				msgLog.Printf("%s", msg)
+				fmt.Printf("%s", msg)
 			}
 			delete(p.stocks, k)
 		}

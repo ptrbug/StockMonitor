@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+var msgLog *log.Logger
+
 func checkHistory(history *history) {
 
 	for {
@@ -33,6 +35,20 @@ func main() {
 
 	//set restart
 	setAutoStart(true)
+
+	err = os.MkdirAll("msg", os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+
+	//msg log
+	tm := time.Now()
+	fileName := fmt.Sprintf("msg/%d_%d_%d %d_%d_%d.txt", tm.Year(), tm.Month(), tm.Day(), tm.Hour(), tm.Minute(), tm.Second())
+	logFile, err := os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, os.ModePerm)
+	if nil != err {
+		panic(err)
+	}
+	msgLog = log.New(logFile, "", log.Ldate|log.Ltime|log.Lshortfile)
 
 	//load config
 	data, err := ioutil.ReadFile("config.json")
